@@ -28,7 +28,7 @@
 
 ### Markdown Slide Tool
 
-* [Reveal.JS](https://revealjs.com/#/)
+* [reveal.js](https://revealjs.com/#/)
 * [remark](https://remarkjs.com/#1)
 * [impress.js](https://impress.js.org)
 
