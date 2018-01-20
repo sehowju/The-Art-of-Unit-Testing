@@ -2,6 +2,10 @@
 
 ![The Art of Unit Testing 2nd Edition](http://im2.book.com.tw/image/getImage?i=http://www.books.com.tw/img/001/076/56/0010765689.jpg&v=59c09d4d&w=348&h=348)
 
+<http://www.books.com.tw/products/0010765689>
+
+## Slides
+
 ## 電子檔
 
 * 第一版
