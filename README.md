@@ -6,6 +6,8 @@
 
 ## Slides
 
+* [ch1, 單元測試的藝術, 2017.01.24, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch1/ch1.html)
+
 ## 電子檔
 
 * 第一版

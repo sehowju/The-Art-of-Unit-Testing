@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Title</title>
+  <meta charset="utf-8">
+  <style>
+    @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+    @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+    @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+    @import url(https://fonts.googleapis.com/earlyaccess/cwtexyen.css);
+
+    body {
+      /* font-family: 'Droid Serif'; */
+      font-family: 'cwTeXYen', serif;
+    }
+
+    h1,
+    h2,
+    h3 {
+      /* font-family: 'Yanone Kaffeesatz'; */
+      font-family: 'cwTeXYen', serif;
+      font-weight: 400;
+      margin-bottom: 0;
+    }
+
+    .remark-slide-content h1 {
+      font-size: 3em;
+    }
+
+    .remark-slide-content h2 {
+      font-size: 2em;
+    }
+
+    .remark-slide-content h3 {
+      font-size: 1.6em;
+    }
+
+    .footnote {
+      position: absolute;
+      bottom: 3em;
+    }
+
+    li {
+      margin-top: 0.25em;
+    }
+
+    li, p {
+      line-height: 1.25em;
+    }
+
+    li p {
+      line-height: 1.25em;
+    }
+
+    .red {
+      color: #fa0000;
+    }
+
+    .large {
+      font-size: 2em;
+    }
+
+    a,
+    a>code {
+      color: rgb(249, 38, 114);
+      text-decoration: none;
+    }
+
+    code {
+      background: #e7e8e2;
+      border-radius: 5px;
+      line-height: 1.16em;
+    }
+
+    .remark-code,
+    .remark-inline-code {
+      font-family: 'Ubuntu Mono';
+    }
+
+    .remark-code-line-highlighted {
+      background-color: #373832;
+    }
+
+    .pull-left {
+      float: left;
+      width: 47%;
+    }
+
+    .pull-right {
+      float: right;
+      width: 47%;
+    }
+
+    .pull-right~p {
+      clear: both;
+    }
+
+    #slideshow .slide .content code {
+      font-size: 0.8em;
+    }
+
+    #slideshow .slide .content pre code {
+      font-size: 0.9em;
+      padding: 15px;
+    }
+
+    .inverse {
+      background: #272822;
+      color: #777872;
+      text-shadow: 0 0 20px #333;
+    }
+
+    .inverse h1,
+    .inverse h2,
+    .inverse h3 {
+      color: #f3f3f3;
+      line-height: 0.8em;
+    }
+
+    .inverse blockquote {
+      padding: 0 1em;
+      color: #B3ABA2;
+      border-left: .25em solid #dfe2e5;
+    }
+    /* Slide-specific styling */
+
+    #slide-inverse .footnote {
+      bottom: 12px;
+      left: 20px;
+    }
+
+    #slide-how .slides {
+      font-size: 0.9em;
+      position: absolute;
+      top: 151px;
+      right: 140px;
+    }
+
+    #slide-how .slides h3 {
+      margin-top: 0.2em;
+    }
+
+    #slide-how .slides .first,
+    #slide-how .slides .second {
+      padding: 1px 20px;
+      height: 90px;
+      width: 120px;
+      -moz-box-shadow: 0 0 10px #777;
+      -webkit-box-shadow: 0 0 10px #777;
+      box-shadow: 0 0 10px #777;
+    }
+
+    #slide-how .slides .first {
+      background: #fff;
+      position: absolute;
+      top: 20%;
+      left: 20%;
+      z-index: 1;
+    }
+
+    #slide-how .slides .second {
+      position: relative;
+      background: #fff;
+      z-index: 0;
+    }
+
+    /* Two-column layout */
+
+    .left-column {
+      color: #777;
+      width: 20%;
+      height: 92%;
+      float: left;
+    }
+
+    .left-column h2:last-of-type,
+    .left-column h3:last-child {
+      color: #000;
+    }
+
+    .right-column {
+      width: 75%;
+      float: right;
+      padding-top: 1em;
+    }
+
+    .half-column {
+      width: 50%;
+      float: left;
+    }
+
+    blockquote {
+      padding: 0 1em;
+      color: #6a737d;
+      border-left: .25em solid #dfe2e5;
+    }
+  </style>
+</head>
+
+<body>
+  <textarea id="source" class="markdown-body">
+
+class: center, middle, inverse
+
+# 單元測試的藝術
+
+## Ch1 單元測試基礎
+
+Dino Lai, 2018.01.24
+
+---
+.left-column[
+## 定義
+### 單元測試
+]
+
+.right-column[
+* 單元測試 1.0
+  > 一個單元測試就是一段程式碼（通常是一個方法），這段程式呼叫了另一段程式碼，然後驗證某些假設的正確性。如果這些假設是錯誤的，單元測試就會失敗。一個「單元」可以是一個方法或函數。 ─ Wikipedia
+* 被測試系統 (System Under Test, SUT)
+  > 被你測試程式所測試的對象。CUT (Class Under Test, Code Under Test)
+* 單元
+  > 系統中的「工作單元」或是一個「使用案例」(use case)
+]
+
+---
+.left-column[
+## 定義
+### 單元測試
+### 工作單元
+]
+
+.right-column[
+從呼叫系統的一個公開方法，到產生一個測試可見的「最終結果」，在期間這個系統所發生的行為。
+* 工作單元越大，那麼它的最終結果對使用這 API 的使用者可見度就越高，測試會更容易維護。
+* 工作單元越小，最終不得不偽造一堆東西，這些東西並不是使用公開 API 的真實最終結果，那只是在過程中的一些中間狀態。(過度指定 overspecification, Ch8)
+]
+
+---
+.left-column[
+## 定義
+### 單元測試
+### 工作單元
+### 最終結果
+]
+
+.right-column[
+只需透過系統的公共 API 和行為就可以觀察到它，而不需透過系統內部狀態才能得知結果。
+* 被呼叫的公開方法回傳一個結果值
+* 在呼叫方法的前後，系統可見的狀態或行為發生變化，這樣的變化不需要透過查詢私有狀態就能取得與判斷。
+  * 登入一個尚未存在的使用者帳戶
+  * 一個狀態機系統的屬性發生變化
+* 呼叫一個不受測試的第三方系統，這個第三方系統並不回傳任何值，或是回傳值系統並不拿來使用。ex: log
+]
+
+---
+class: center, middle, inverse
+
+### 單元測試定義 1.1
+
+> 一個單元測試是一段程式呼叫一個工作單元，並驗證工作單元的一個具體最終結果。如果對這個最終結果的假設是錯誤的，那單元測試就失敗了。一個單元測試的範圍，可以小到一個方法，大到多個類別。
+
+---
+## 優秀的單元測試
+
+* 自動化、可被重覆執行
+* 容易被實現
+* 不是臨時性的
+* 可以按個按鈕就執行它
+* 執行速度很快
+* 不管執行幾次，執行結果都一致
+* 完全掌控被測試單元
+* 完全被隔離的（獨立於其他測試）
+* 執行結果失敗時，簡單清楚的呈現我們期望為何，發生問題的原因在哪
+
+---
+## 判斷是否為單元測試
+
+* 之前寫的單元測試，今天還能正常執行並得到結果嗎？
+* 團隊中的任何一個人是否都能正常執行？
+* 能在幾分鐘之內跑完所有單元測試？
+* 能夠一鍵執行所有寫過的單元測試？
+* 能在幾分鐘之內寫出一個基本的單元測試？
+
+以上皆是才為「單元測試」，否則則為「整合測試」。
+
+---
+class: middle, center, inverse
+
+## 整合測試
+### Integration Test
+
+---
+.left-column[
+## 整合測試
+### 整合測試
+]
+
+.right-column[
+* 如果一個測試需要用到系統真實時間、真實的檔案系統、或者真實的資料庫
+* 整合測試與單元測試一樣重要，但兩種測試應該被分開，以營造「綠色安全區域」(ch7.2.2)
+* 問題：一次測試的東西太多
+* 系統整合測試
+  > 一個有順序的測試過程，將軟硬體相結合並進行測試直到整個系統被整合在一起。- The Complete Guide to Software Teting, Bill Hetzel, 1993
+* 作者定義
+  > 整合測試是對一個工作單元進行測試，而這個測試對被測試單元並沒有完全的控制，而是使用該單元一個或多個真實依賴的相依物件，例如時間、網路、資料庫、執行緒、或亂數產生器等等。
+]
+
+---
+.left-column[
+## 整合測試
+### 整合測試
+### 示意圖
+]
+
+.right[![figure 1.2](figure-1.2.png)]
+
+---
+.left-column[
+## 整合測試
+### 整合測試
+### 示意圖
+### v. 單元測試
+]
+
+.right-column[
+* 整合測試
+  * 實際使用到真實的相依物件或資源
+* 單元測試
+  * 把被測試單元與其他相依物件或資源隔離開來，以保證單元測試結果的高度穩定，還可以輕易控制和模擬被測試單元任何方面的行為。
+]
+
+---
+class: middle, center, inverse
+
+## 進一步認識單元測試
+
+---
+## 單元測試的好處
+
+* 之前寫的單元測試，今天還能正常執行並得到結果嗎？可以。
+  * 容易發現「不經意的 bug」
+    > 修改程式之後，不能（或不願意）對之前所有的功能進行測試，就可能發生改東壞西的情形。
+* 團隊中的任何一個人是否都能正常執行？可以。
+  * 容易修改「遺留程式碼」(Legacy Code)
+    > 「一段作業系統或其他電腦科技都不再支援或製造的程式碼」- Wikipedia
+    >
+    > 比目前版本老舊的程式碼─很多公司
+    >
+    > 難以維護使用、難以測試、難以閱讀的程式碼
+    >
+    > 「只是能動的程式碼」─有一個客戶
+    >
+    > 沒有測試保護的程式碼 - Working Effectively with Legacy Code, Michael Feathers, 2004
+
+---
+## 單元測試的好處 Cont.
+
+* 能在幾分鐘之內跑完所有單元測試嗎？可以。
+  * 儘早得到回饋確保自己沒弄壞什麼功能
+  * 如果不能很快地執行所有測試，你就不會經常地執行他們
+* 能夠一鍵執行所有寫過的單元測試？可以。
+  * 沒有人會只是為了確保系統仍能正常運作，而去花時間設定一堆東西，再去執行測試。
+  * 開發人員有著更重要的任務：增加功能
+* 能在幾分鐘之內寫出一個基本的單元測試？可以。
+  * 整合測試需要多花費一點時間，因為它涉及內部與外部的依賴。ex: 資料庫
+  * 撰寫測試的難度越高，願意撰寫的自動測試就越少
+  * 單元測試：測試出每個問題的細節，而不只是關注於大問題。
+
+---
+## 優秀的單元測試
+
+* 單元測試的最終定義
+  > 一個單元測試就是一段自動化的程式碼，這段程式會呼叫被測試的工作單元，之後對這個單元的單一最終結果的某些假設或期望進行驗證。
+  >
+  > 單元測試幾乎都是使用單元測試框架進行撰寫的。撰寫單元測試很容易，執行起來快速。
+  >
+  > 單元測試可靠、易讀、並且很容易維護。只要產品程式碼不發生變化，單元測試的執行結果是穩定一致的。
+* 第一版：「只針對控制流程的程式碼來執行」
+  > 控制流程程式碼：if, loop, switch case, 計算、決策
+* 第二版：「沒有邏輯的屬性存取也肯定會在工作單元中被使用到，因此不需要特別或單獨針對這些程式碼測試。」
+  > 沒有邏輯的屬性存取：set, get
+
+  * 有加入檢驗或處理，就需要測試
+
+---
+class: middle, center, inverse
+
+### 一個簡單的單元測試範例
+
+---
+## 不用測試框架的簡單範例 SUT
+
+ParseAndSum：傳入一個帶有一個數字的字串，將他的數字返回。
+
+```php
+class SimpleParser
+{
+    public function parseAndSum(string $numbers): int
+    {
+        if (strlen($numbers) === 0) {
+            return 0;
+        }
+        if (!strpos($numbers, ",")) {
+            return intval($numbers);
+        } else { // for readable
+            throw new Exception("I can only handle 0 or 1 numbers for now!");
+        }
+    }
+}
+```
+.center[[code-1.1.php](code-1.1.php)]
+
+---
+## 不用測試框架的簡單範例 Test
+
+測試字串空白時，應該會回傳 0，不為 0 時則列出錯誤訊息。
+
+```php
+class SimpleParserTests
+{
+    public static function testReturnsZeroWhenEmptyString()
+    {
+        try {
+            $p = new SimpleParser();
+            $result = $p->parseAndSum("");
+            if ($result !== 0) {
+                echo "SimpleParserTests::testReturnsZeroWhenEmptyString:" . PHP_EOL;
+                echo "--------" . PHP_EOL;
+                echo "Parse and sum should have returned 0 on an empty string" . PHP_EOL;
+            }
+        } catch (Exception $e){
+            echo $e;
+        }
+    }
+}
+```
+
+.center[[code-1.2.php](code-1.2.php)]
+
+---
+## 不用測試框架的簡單範例 Main
+
+執行測試
+
+```php
+try {
+    SimpleParserTests::testReturnsZeroWhenEmptyString();
+} catch (Exception $e) {
+    echo $e;
+}
+```
+
+.center[[code-1.3.php](code-1.3.php)]
+
+---
+## 不用測試框架的簡單範例 Refactor
+
+抽出列出錯誤訊息的程式碼，以便其它測試方法使用。[code-1.4.php](code-1.4.php)
+
+```php
+class TestUtil
+{
+    public static function showProblem(string $test, string $message)
+    {
+        echo "---{$test}---\n{$message}\n--------------------\n";
+    }
+}
+
+class SimpleParserTests
+{
+    public static function testReturnsZeroWhenEmptyString()
+    {
+*       $testName = __METHOD__; // 使用 magic method 獲得執行方法的名稱
+        try {
+            $p = new SimpleParser();
+            $result = $p->parseAndSum("");
+            if ($result !== 0) {
+                TestUtil::showProblem($testName, "Parse and sum should have returned 0 on an empty string");
+            }
+        } catch (Exception $e){
+            echo $e;
+        }
+    }
+}
+```
+
+---
+class: center, middle, inverse
+
+## 測試驅動開發
+### Test-Driven Development
+---
+.left-column[
+## TDD
+### Intro
+]
+
+.right-column[
+* TDD: Test-Driven Development
+* [TDD 的各種含義](http://osherove.com/blog/2007/10/8/the-various-meanings-of-tdd.html)
+* TDD 並不能保證你的專案一定會成功，或是測試都具備健壯性 (Robustness) 或可維護性。
+* 人們很容易陷入 TDD 的技術細節，而忘記關注於編寫單元測試的方式。
+  * 測試的命名
+  * 測試的可維護性
+  * 測試的可讀性
+  * 是否測試正確的內容
+  * 測試本身是否有缺陷或設計不良的地方
+]
+
+---
+## Comparision: Traditional vs. TDD
+
+.half-column[
+![figure 1.3](figure-1.3.png)
+.center[figure 1.3 The Traditional way]
+]
+.half-column[
+.right[![figure 1.4](figure-1.4.png)]
+.center[figure 1.4 Test-driven development]
+]
+
+---
+.left-column[
+## TDD
+### Intro
+### Comparision
+### Steps
+]
+
+.right-column[
+1. 撰寫一個會失敗的測試，以證明產品中程式或功能的缺失。
+1. 撰寫符合測試預期的產品程式碼，以通過測試。
+1. 重構程式碼。
+> 重構意味著在不改變功能的前提下，修改程式碼，改善其可讀性、可維護性。
+> * 重新命名
+> * 最大的方法分成多個較小的方法
+>
+> 重構之後變得更容易維護、理解、偵錯和修改
+]
+
+---
+.left-column[
+## TDD
+### Intro
+### Comparision
+### Steps
+### 雙面刃
+]
+
+.right-column[
+* 實施得當
+  * 極大化提昇程式的品質
+  * 減少 bug 數量
+  * 提昇對程式的信心
+  * 縮短發現 bug 的時間
+  * 優化程式設計
+* 實施不當
+  * 專案時程延宕
+  * 浪費時間
+  * 打擊士氣
+  * 降低程式品質
+* 最大好處：測試你的測試
+  * 後寫測試：白箱測試
+  * 先寫測試：黑箱測試
+]
+
+---
+.left-column[
+## TDD
+### Intro
+### Comparision
+### Steps
+### 雙面刃
+### 核心技能
+]
+
+.right-column[
+1. 知道如何撰寫優秀的測試
+  * [單元測試的藝術](http://www.books.com.tw/products/0010765689)
+1. 撰寫產品程式碼之前撰寫測試
+  * [Test-Driven Development: by Example, Kent Beck, 2002](http://www.books.com.tw/products/F010196686)
+1. 良好的測試設計
+  * [Growing Object-Oriented Software, Guided by Tests, Steve Freeman, Nat Pryce, 2009](http://www.books.com.tw/products/F011525012)
+  * [無瑕的程式碼, Robert C.Martin](http://www.books.com.tw/products/0010579897)
+]
+
+---
+## 小結
+
+在這章我們瞭解到
+* 優秀的單元測試應該具備的特質
+* 什麼是一個單元？
+* 瞭解自己在撰寫整合測試還是單元測試
+* 整合測試 vs. 單元測試
+* 初探測試驅動開發
+
+---
+class: middle, center, inverse
+
+## 問題與討論
+
+    </textarea>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js">
+  </script>
+  <script>
+    var slideshow = remark.create({
+      // ratio: '16:9',
+      highlightStyle: 'monokai',
+      highlightLines: true
+    });
+  </script>
+</body>
+
+</html>
