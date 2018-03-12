@@ -6,8 +6,8 @@
 
 ## Slides
 
-* [Ch1, 單元測試基礎, 2017.01.24, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch1/index.html)
-* [Ch2, 第一個單元測試, 2017.02.05, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch2/index.html)
+* [Ch1, 單元測試基礎, 2017.01.24, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch1/slide.html)
+* [Ch2, 第一個單元測試, 2017.02.05, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch2/slide.html)
 
 ## 電子檔
 
