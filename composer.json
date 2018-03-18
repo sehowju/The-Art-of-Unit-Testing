@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Ch2\\": "ch2/",
+            "Ch3\\": "ch3/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
+    }
+}
