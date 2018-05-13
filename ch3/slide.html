@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Title</title>
+  <meta charset="utf-8">
+  <style>
+    @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+    @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+    @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+    @import url(https://fonts.googleapis.com/earlyaccess/cwtexyen.css);
+
+    body {
+      /* font-family: 'Droid Serif'; */
+      font-family: 'cwTeXYen', serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      /* font-family: 'Yanone Kaffeesatz'; */
+      font-family: 'cwTeXYen', serif;
+      font-weight: 400;
+      margin-bottom: 0;
+    }
+
+    .remark-slide-content h1 {
+      font-size: 3em;
+    }
+
+    .remark-slide-content h2 {
+      font-size: 2em;
+    }
+
+    .remark-slide-content h3 {
+      font-size: 1.6em;
+    }
+
+    .remark-slide-content h4 {
+      font-size: 1.2em;
+    }
+
+    .remark-slide-content h5 {
+      font-size: 1em;
+      font-weight: bold;
+    }
+
+
+
+    .footnote {
+      position: absolute;
+      bottom: 3em;
+    }
+
+    li p {
+      line-height: 1.25em;
+    }
+
+    .red {
+      color: #fa0000;
+    }
+
+    .large {
+      font-size: 2em;
+    }
+
+    a,
+    a>code {
+      color: rgb(249, 38, 114);
+      text-decoration: none;
+    }
+
+    code {
+      background: #e7e8e2;
+      border-radius: 5px;
+    }
+
+    .remark-code,
+    .remark-inline-code {
+      font-family: 'Ubuntu Mono';
+    }
+
+    .remark-code-line-highlighted {
+      background-color: #373832;
+    }
+
+    .pull-left {
+      float: left;
+      width: 47%;
+    }
+
+    .pull-right {
+      float: right;
+      width: 47%;
+    }
+
+    .pull-right~p {
+      clear: both;
+    }
+
+    #slideshow .slide .content code {
+      font-size: 0.8em;
+    }
+
+    #slideshow .slide .content pre code {
+      font-size: 0.9em;
+      padding: 15px;
+    }
+
+    .inverse {
+      background: #272822;
+      color: #777872;
+      text-shadow: 0 0 20px #333;
+    }
+
+    .inverse h1,
+    .inverse h2 {
+      color: #f3f3f3;
+      line-height: 0.8em;
+    }
+
+    table {
+      display: inline;
+      width: 100%;
+      overflow: auto;
+      margin-top: 0;
+      margin-bottom: 16px;
+      border-collapse: collapse;
+    }
+
+    table th {
+      font-weight: 600;
+    }
+
+    table th,
+    table td {
+      padding: 6px 13px;
+      border: 1px solid #dfe2e5;
+    }
+
+    table tr {
+      background-color: #fff;
+      border-top: 1px solid #c6cbd1;
+    }
+
+    table tr:nth-child(2n) {
+      background-color: #f6f8fa;
+    }
+
+    /* Slide-specific styling */
+
+    #slide-inverse .footnote {
+      bottom: 12px;
+      left: 20px;
+    }
+
+    #slide-how .slides {
+      font-size: 0.9em;
+      position: absolute;
+      top: 151px;
+      right: 140px;
+    }
+
+    #slide-how .slides h3 {
+      margin-top: 0.2em;
+    }
+
+    #slide-how .slides .first,
+    #slide-how .slides .second {
+      padding: 1px 20px;
+      height: 90px;
+      width: 120px;
+      -moz-box-shadow: 0 0 10px #777;
+      -webkit-box-shadow: 0 0 10px #777;
+      box-shadow: 0 0 10px #777;
+    }
+
+    #slide-how .slides .first {
+      background: #fff;
+      position: absolute;
+      top: 20%;
+      left: 20%;
+      z-index: 1;
+    }
+
+    #slide-how .slides .second {
+      position: relative;
+      background: #fff;
+      z-index: 0;
+    }
+
+    /* Two-column layout */
+
+    .left-column {
+      color: #777;
+      width: 20%;
+      height: 92%;
+      float: left;
+    }
+
+    .left-column h2:last-of-type,
+    .left-column h3:last-child {
+      color: #000;
+    }
+
+    .right-column {
+      width: 75%;
+      float: right;
+      padding-top: 1em;
+    }
+
+    .half-column {
+      width: 50%;
+      float: left;
+    }
+
+    blockquote {
+      padding: 0 1em;
+      color: #6a737d;
+      border-left: .25em solid #dfe2e5;
+    }
+  </style>
+</head>
+
+<body>
+  <textarea id="source" class="markdown-body">
+
+class: center, middle, inverse
+
+# 單元測試的藝術
+
+## Ch3 透過虛設常式 (Stub) 解決依賴問題
+
+Dino Lai, 2018.03.15
+
+---
+class: middle, center, inverse
+
+## Stub 簡介
+
+---
+### 定義
+
+> **外部依賴 (external dependency)** 是指在系統中的一個物件，它與被測試程式碼之間產生互動，但你無法掌控這個物件。例：檔案系統、執行緒、記憶體、時間、Web 服務以及其他第三方物件等等
+
+> **虛設常式 (stub)** 是在系統中產生一個可控的替代物件，來取代一個外部相依物件 (或**協作者**)。你可以在程式中，透過虛設常式來避免必須直接相依物件所造成的問題。
+
+.center[
+
+測試模式名稱
+
+[xUnit Test Patterns: Refactoring Test Code - Gerard Meszaros](https://www.goodreads.com/book/show/337302.xUnit_Test_Patterns)
+
+|      |   Stub   |   Mock   |  Fake  |
+| ---- | :------: | :------: | :----: |
+| 中文 | 虛設常式 | 模擬物件 | 假物件 |
+| 驗證 |    ×     |    ○     |   △    |
+
+]
+---
+class: middle, center, inverse
+
+## LogAn
+
+---
+### 找到外部依賴
+
+* 針對多種 log 檔案的副檔名來設定特定的轉接器 (adapter) 進行處理。
+  * 支援的日誌檔案設定，存成 config 檔
+
+    ```php
+    public IsValidLogFileName(string fileName): bool
+    {
+        // 讀取 config 檔
+        // 支援該副檔名，則回傳 true
+    }
+    ```
+
+* 讀取檔案系統！→ 整合測試
+
+> **抑制測試 (test inhibiting)**：當程式碼依賴於某個外部資源，即使程式碼本身的邏輯是完全正確的，但這種依賴仍可能導致測試失敗。
+
+---
+### 抑制測試 (test inhibiting)
+
+方法直接依賴於檔案系統。這種設計將使得被測試元的物件無法進行單元測試，只能透過整合測試來驗證。
+
+.center[
+![figure-3.1](figure-3.1.png)
+圖 3.1
+]
+
+---
+### 讓測試更簡單
+
+* 「任何物件導向的問題，都可以透過增加一層<mark>中介層 (a layer of indirection) </mark>來解決；當然，除了中介層過多的這個問題」─ [Abstraction Layer@Wikipedia](https://en.wikipedia.org/wiki/Abstraction_layer)
+*  單元測試的藝術中，「藝術」的精華在於，如何找到合適的地方加入或使用一個中介層來測試你的程式碼。
+  * 程式碼無法測試？加入一個中間層來封裝對這段代碼的呼叫行為，接著就可以在測試中模擬這個中介層的實作內容
+  * 讓這段無法測試的程式碼變得可抽換
+  * 中間層已經存在時，要能夠發現它，而不是重新創造一個新的取代它。
+  * 新加入一個中間層可能導致邏輯過於複雜，要有能力選擇不使用它。
+
+---
+### 加入中介層
+
+加入一個中介層以避免對檔案系統的直接相依。讀取檔案系統的程式碼，被隔離到一個 FileExtensionManager 的類別中，這個類別之後將在測試中被虛設常式所取代。
+
+.center[
+![figure-3.3](figure-3.3.png)
+
+圖 3.3
+]
+
+
+---
+### 解除依賴的具體模式：
+
+1. 找到被測試物件所使用的**介面**或 **API**
+1. 找到導致被測試的工作單元無法順利測試的**介面** (一起協作的方法或類別)。(config 檔)
+1. 如果被測試的工作單元是**直接相依**於這個介面 (檔案系統)，透過在程式碼中加入一個中介層，隱藏這個直接相依的行為，這樣程式碼就具備可測試性。(將讀取檔案系統的行為，移到單讀的類別 FileExtensionManager)
+1. 將相依介面的**底層實作**內容替換成你可以控制的程式碼。(FileExtensionManager 替換成 StubExtensionManager)，以便讓測試能夠控制外部相依物件的行為。
+  * Stub 根本不會直接讀取檔案系統，解除了測試目標物件對檔案系統的依賴關係。
+
+---
+### 新增介面
+
+透過 Stub 來解除依賴關係，現在你的程式碼不應該也不需要關心它所依賴的 FileExtensionManager 內部是怎麼實作的。
+
+.center[
+![figure-3.4](figure-3.4.png)
+
+圖 3.4
+]
+
+---
+class: middle, center, inverse
+
+## 重構設計提昇程式碼可測試性
+
+---
+### 定義
+
+> 重構 (refactoring)：在不改變程式碼功能的前提下，修改程式碼的動作。例：重新命名、較長內容的方法拆成幾個較短的方法。
+
+> 接縫 (seam)：在程式碼中可以抽換不同功能的地方 ─ Working Effectively with Legacy Code。接縫透過實作開放封閉原則 (Open-Closed Principle) 來完成，類別功能對擴充開放，對直接修改封閉。— 無暇的程式碼。
+  * 使用 Stub class
+  * 增加一個 constructor 參數
+  * 增加一個 public property
+  * 把一個方法改成可供覆寫的虛擬方法
+  * 把一個委派拉出來變成一個參數或屬性供類別外部來決定內容。
+
+---
+### 重構
+
+* 修改現有程式碼之前，永遠記得要準備好整合測試作保護。或是備份好程式碼。
+* 解除依賴的兩種重構方法：
+  * A 型：將具象類別 (concrete class) 抽象成介面 (interfaces) 或委派 (delegates)
+      * 擷取介面以便替換底層實作內容
+  * B 型：重構程式碼，以便將委派或介面的**偽實作**注入至目標物件中。(Dependency Injection)
+      * 在被測試類別中注入一個 Stub 的實作內容
+      * 在建構函式注入一個假物件
+      * 從屬性的讀取或設定中注入一個假物件
+      * 在方法被呼叫前注入一個假物件
+
+---
+### 擷取介面以便替換底層實作內容
+
+1 將讀取檔案系統的程式碼，移到單獨的類別中
+
+```php
+class LogAnalyzer
+{
+    public IsValidLogFileName(string $fileName): bool
+    {
+        $mgr = new FileExtensionManager();
+        return $mgr->isValid($fileName);
+    }
+}
+
+class FileExtensionManager
+{
+    public function isValid(string $fileName): bool
+    {
+        // 讀取檔案
+    }
+}
+```
+
+---
+### 擷取介面以便替換底層實作內容, Cont.
+
+2 增加 Interface，以抽換 FileExtensionManager
+
+```php
+interface ExtensionManagerInterface
+{
+    public function isValid(string $fileName): bool;
+}
+
+class FileExtensionManager implements ExtensionManagerInterface
+{
+    public function isValid(string $fileName): bool
+    {
+        // 讀取檔案
+    }
+}
+
+public IsValidLogFileName(string $fileName): bool
+{
+    $mgr = new FileExtensionManager();
+    return $mgr->isValid($fileName);
+}
+```
+
+---
+### 擷取介面以便替換底層實作內容, Cont.
+
+3 Create Stub
+
+```php
+class AlwaysValidFakeExtensionManager implements ExtensionManagerInterface
+{
+    public function isValid(string $fileName): bool
+    {
+        return true
+    }
+}
+```
+
+#### 命名
+
+不叫 **StubExtensionManager** 或是 **MockExtensionManager** 而是 **FakeExtensionManager**
+
+> 說明這個類別物件類似另一個物件，但它可能被當作 mock 或是 stub 使用。
+延遲決定這個用來當作替代品的物件究竟是 mock 或是 stub。
+
+---
+### 加入接縫
+
+依賴注入 (Dependency Injection)
+* 在 constructor 中得到一個介面物件，並將其存到欄位 (field) 中使用。
+* 使用 get 或 set 得到一個介面物件，並將其存到欄位 (field) 中使用。
+* 透過以下其中一種方式，在被測試方法呼叫之前獲得一個介面的假物件：
+  * 方法的參數 (參數注入)
+  * 工廠類別
+  * 區域工廠方法 (local factory method)
+  * 前面幾種方法的變形
+
+---
+### 建構函式注入
+
+* SUT
+
+    ```php
+    class LogAnalyzer
+    {
+        private $manager;
+
+        public function construct(ExtensionManagerInterface $mgr)
+        {
+            $this->manager = $mgr;
+        }
+
+        public function isValidLogFileName(string $fileName): bool
+        {
+            return $this->manager->isValid($fileName);
+        }
+    }
+    ```
+
+* Interface
+
+    ```php
+    interface ExtensionManagerInterface
+    {
+        public function isValid(string $fileName): bool;
+    }
+    ```
+
+---
+### 建構函式注入─測試程式
+
+* Stub
+
+    ```php
+    class FakeExtensionManager implements ExtensionManagerInterface
+    {
+        public $willBeValid = false;
+        public isValid(string $fileName): bool
+        {
+            return $willBeValid;
+        }
+    }
+    ```
+
+* Test
+
+    ```php
+    class LogAnalyzerTest extends TestCase
+    {
+        public function test_IsValidFileName_NameSupportedExtension_ReturnsTrue()
+        {
+            $myFakeManager = new FakeExtensionManager();
+            $myFakeManager->willBeValid = true;
+            $log = new LogAnalyzer($myFakeManager);
+            $result = log.isValidLogFileName("short.txt");
+            $this->assertTrue($result);
+        }
+    }
+    ```
+
+---
+### 建構函式注入─優缺點
+
+#### 缺點
+
+* 使得這些參數成為了必要的依賴 (假設這是被測試類別唯一的建構函式)，使用者必須得為每個特定的依賴傳入參數。
+* 若被測試類別需要多個 Stub 才能在沒有直接依賴關係下正常運作，加入越來越多參數就會越來越困難，降低程式的可讀性與可維護性。
+    ```php
+    public function construct($mgr, $logger, $service)
+    {
+        $this->manager = $mgr
+        $this->logger = $logger
+        $this->service = $service
+    }
+    ```
+* Solution
+    1. 參數物件重構 (parameter object refactoring)，建立一個特殊的類別，用來裝載要初始化被測試類別所需的所有值。
+    2. 控制反轉 (Inversion of Control, IoC), ex: [Service Container@Laravel](https://laravel.com/docs/5.6/container)
+* 讓測試程式看起來很笨拙
+
+#### 優點
+
+* 通常還是會選擇使用建構函式注入，因為在 API 的可讀性和語意上，這方式所帶來的影響是最小的。
+* 有效向 API 使用者表達：在呼叫這個 API 時，是必須相依這個物件才能正常運作的，因此需要在初始化時傳入該相依物件。
+
+---
+### 用假物件模擬異常
+
+* 透過設定 Stub 來拋出例外
+* ExtensionManager 拋出例外時，LogAnalyzer 應該回傳 false，而不是在把例外往外拋。
+  * 使用 try catch
+
+        ```php
+        class LogAnalyzer
+        {
+            private $manager;
+
+            public function __construct(ExtensionManagerInterface $mgr)
+            {
+                $this->manager = $mgr;
+            }
+
+            public function isValidLogFileName(string $fileName): bool
+            {
+                try {
+                    $valid = $this->manager->isValid($fileName);
+                } catch (Exception $e) {
+                    return false;
+                }
+                return $valid;
+            }
+        }
+        ```
+
+---
+* 假物件
+
+    ```php
+    class FakeExtensionManager implements ExtensionManagerInterface
+    {
+        public $willBeValid = false;
+        public $willThrow = null;
+        public function isValid(string $fileName): bool
+        {
+            if (!is_null($this->willThrow)) {
+                throw $this->willThrow;
+            }
+            return $this->willBeValid;
+        }
+    }
+    ```
+
+* 測試程式
+
+    ```php
+    class LogAnalyzerTest extends TestCase
+    {
+        public function test_IsValidFileName_ExtManagerThrowsException_ReturnsFalse()
+        {
+            $myFakeManager = new FakeExtensionManager();
+            $myFakeManager->willThrow = new Exception("this is fake");
+
+            $log = new LogAnalyzer($myFakeManager);
+            $result = $log->isValidLogFileName("anything.anyextension");
+
+            $this->assertFalse($result);
+        }
+    }
+    ```
+
+---
+### 透過屬性注入假物件
+
+* public property
+* getter and setter
+
+    ```php
+    class LogAnalyzerProperty
+    {
+        public $manager;
+
+        public function setManager(ExtensionManagerInterface $manager)
+        {
+            $this->manager = $manager;
+        }
+
+        public function getManager()
+        {
+            return $this->manager;
+        }
+
+        public function isValidLogFileName(string $fileName): bool
+        {
+            try {
+                $this->manager->isValid($fileName);
+            } catch (\Exception $e) {
+                return false;
+            }
+            return true;
+        }
+    }
+    ```
+
+---
+
+* 測試程式
+
+    ```php
+    class LogAnalyzerTest extends TestCase
+    {
+        public function test_IsValidFileName_NameSupportedExtension_UseProperty_ReturnsTrue()
+        {
+            $myFakeManager = new FakeExtensionManager();
+            $myFakeManager->willBeValid = true;
+            $log = new LogAnalyzerProperty();
+            $log->manager = $myFakeManager;
+            $result = $log->isValidLogFileName("short.txt");
+            $this->assertTrue($result);
+        }
+
+        public function test_IsValidFileName_NameSupportedExtension_UseSetter_ReturnsTrue()
+        {
+            $myFakeManager = new FakeExtensionManager();
+            $myFakeManager->willBeValid = true;
+            $log = new LogAnalyzerProperty();
+            $log->setManager($myFakeManager);
+            $result = $log->isValidLogFileName("short.txt");
+            $this->assertTrue($result);
+        }
+    }
+    ```
+
+#### 使用時機
+
+* 要使用這個類型的物件，這個相依並不一定非得存在不可。
+* 測試過程中，這個相依物件會被建立預設的物件，進而避免造成測試的問題。
+
+---
+### 呼叫方法之前才注入假物件
+
+#### 使用工廠類別
+
+* 在被測試類別的建構函式中，初始化 ExtensionManager 的執行個體，這個執行個體是來自<mark>工廠類別</mark>。
+* 工廠模式是一種設計模式，允許某個類別的職責專注於產生物件。
+* 大部份的設計上，不允許從工廠類別外部來修改回傳的物件，這樣的設計是為了保障此類別的封裝性。
+* 一旦在測試程式中使用了靜態類別，透過靜態欄位來存放假物件，就必須在每個測試執行之前 (setup) 或之後 (tearDown)，重置工廠的狀態。
+
+* SUT
+
+    ```php
+    class LogAnalyzerFactory
+    {
+        private $manager;
+
+        public function __construct()
+        {
+            $this->manager = ExtensionManagerFactory::Create();
+        }
+
+        public function isValidLogFileName(string $fileName): bool
+        {
+            return $this->manager->isValid($fileName);
+        }
+    }
+    ```
+---
+* 工廠類別
+
+    ```php
+    class ExtensionManagerFactory
+    {
+        private static $customManager = null;
+
+        public static function Create(): ExtensionManagerInterface
+        {
+            if (!is_null(self::$customManager)) {
+                return self::$customManager;
+            }
+            return new FileExtensionManager();
+        }
+
+        // remove declaration for multi types
+        public static function setManager($mgr)
+        {
+            self::$customManager = $mgr;
+        }
+    }
+    ```
+---
+
+    * 測試程式
+
+    ```php
+    class LogAnalyzerFactoryTest extends TestCase
+    {
+        public function test_IsValidFileName_NameSupportedExtension_ReturnsTrue()
+        {
+            $myFakeManager = new FakeExtensionManager();
+            $myFakeManager->willBeValid = true;
+            ExtensionManagerFactory::setManager($myFakeManager);
+            $log = new LogAnalyzerFactory();
+            $result = $log->isValidLogFileName("short.txt");
+            $this->assertTrue($result);
+        }
+
+        public function tearDown()
+        {
+            ExtensionManagerFactory::setManager(null);
+        }
+    }
+    ```
+
+* 工廠方法
+  * 簡單工廠
+  * 工廠方法
+  * 抽象工廠
+* 要在工廠類別中加入一個接縫，讓它們可以回傳自訂的虛設常式，而不是預設的實作物件。
+* <mark>debug</mark> 開關，開啟時，可讓接縫自動產生一個假的或可測試的物件來使用，而非使用預設的產品程式實作內容。
+
+---
+#### 在發佈版本中隱藏接縫
+
+* 條件編譯參數 [Conditional]
+* 後述 (3.6.2)
+
+
+---
+#### 不同的中間層深度等級
+
+1. 針對類別中的 <mark>FileExtensionManager</mark> 變數
+  * 新增一個建構函式參數，以便傳入相依物件。
+  * 被測試類別中只有一個成員是偽造的，其餘程式碼保持不變。
+  * 需考慮所增加的建構參數對其他程式碼呼叫時，是否合理、方便。會改便被測試程式碼的語意。
+  * 除非有很好的理由，否則還是建議避免使用這種作法。
+1. 針對從<mark>工廠注入</mark>被測試類別的相依物件
+  * 透過工廠類別的賦值方法設定一個假的相依物件。
+  * 工廠內的成員是偽造的，被測試類別完全不需要調整。
+  * 需要瞭解誰會在何時呼叫工廠。
+1. 針對返回相依物件的<mark>工廠類別</mark>
+  * 將工廠類別直接替換成一個假工廠，假工廠會回傳假的相依物件。
+  * 工廠是假的，回傳的物件也是偽造的，被測試類別完全不需要調整。
+  * 建立一個假工廠，實作工廠介面，回傳測試案例中所需要的假相依物件。（一個假物件回傳另一個假物件）。
+  * 將假工廠類別注入到被測試類別中。
+  * 這讓測試程式變得更不容易理解，建議最好還是盡量避免。
+
+* 控制的中間層深度越深（程式執行的堆疊越深），你對被測試程式的控制能力越大，因為所建立的 Stub 就能控制更多更深的物件行為。
+* 中間層越深，測試程式就越難被理解，越難找到適合插入接縫的位置。
+* 要在複雜度與掌控能力之間找到平衡點，程式依然好讀易懂，還能完全控制被測試程式的情況。
+* 選擇對現有程式碼改動最小的方法。
+
+---
+#### 偽造方法─區域的工廠方法（擷取與覆寫 (Extract and Override)）
+
+在接近被測試程式的表層中建立一個全新的中間層。越接近程式碼的表層，為了模擬相依物件所需要修改的內容越少。
+
+1. 被測試類別宣告一區域虛擬方法作為工廠方法，以獲取 FileExtensionManager 物件。作為接縫。
+1. 在測試程式新增一個類別，<mark>繼承</mark>被測試程式，<mark>覆寫</mark>其工廠方法，在這邊注入設定好的假相依物件。
+
+##### 步驟
+
+* 被測試類別
+  1. 新增一個新的虛擬工廠方法，回傳一個實際的物件執行個體
+  1. 在產品程式碼正常的使用該工廠方法。
+* 測試專案
+  1. 新增類別
+  1. 新類別繼承被測試類別
+  1. 針對要取代的型別，建立公開欄位
+  1. 覆寫工廠方法
+  1. 回傳公開欄位
+* 測試程式
+  1. 初始化一個實作 ExtensionManagerInterface 的 Stub 物件
+  1. 初始化在測試專案中所新增的子類別，而非被測試類別
+  1. 將 Stub 透過子類別的接縫，注入至子類別物件中
+
+此時測試子類別時，等同於測試被測試類別，但相依物件已經從被覆寫的工廠方法注入一個假物件
+
+---
+* SUT
+
+    ```php
+    class LogAnalyzerUsingFactoryMethod
+    {
+        public function isValidLogFileName(string $fileName): bool
+        {
+            return $this->getManager()->IsValid($fileName);
+        }
+
+        protected function getManager(): ExtensionManagerInterface
+        {
+            return new FileExtensionManager();
+        }
+    }
+    ```
+
+* Stub
+
+    ```php
+    class TestableLogAnalyzer extends LogAnalyzerUsingFactoryMethod
+    {
+        private $manager;
+
+        public function __construct(ExtensionManagerInterface $manager)
+        {
+            $this->manager = $manager;
+        }
+
+        protected function getManager(): ExtensionManagerInterface
+        {
+            return $this->manager;
+        }
+    }
+    ```
+
+---
+* Test
+
+    ```php
+    class LogAnalyzerUsingFactoryMethodTest extends TestCase
+    {
+        public function test_IsValidFileName_NameSupportedExtension_ReturnsTrue()
+        {
+            $myFakeManager = new FakeExtensionManager();
+            $myFakeManager->willBeValid = true;
+
+            $log = new TestableLogAnalyzer($myFakeManager);
+            $result = $log->isValidLogFileName("short.txt");
+            $this->assertTrue($result);
+        }
+    }
+    ```
+
+好處
+
+* 無須進入到過深的層次就可以直接替換相依物件
+* 使用更少的介面，更多的虛擬方法。
+* 作者稱為「破解與覆寫」(ex-crack and override)
+
+---
+#### 何時該使用
+
+* 適合用來模擬提供給被測試類別的**輸入**(input)
+  * 模擬自訂的回傳值
+* 不適合拿來驗證被測試程式對相依物件的呼叫。
+  * 驗證被測試類別對 Web 服務的互動是否正確。
+  * 隔離框架(isolation)更適合
+* 需要模擬被測試類別由外部取得或回傳的輸入值
+  * 程式碼語意不會為了可測試性而改變，不影響外部行為。
+* 不需使用：若程式碼已明顯具備了可測試性的所需條件
+  * 可以偽造的介面
+  * 已經存在一個可以注入接縫的位置
+* 若被測試類別是可以被繼承的，優先使用此方法。
+
+解除依賴的技巧
+* [Working Effectively with Legacy Code ─ Michael Feathers](https://www.goodreads.com/book/show/44919.Working_Effectively_with_Legacy_Code)
+* [簡中：修改代碼的藝術](https://book.douban.com/subject/2248759/)
+
+---
+
+class: middle, center, inverse
+
+## 重構技術的變形
+
+---
+### 繼承 vs 介面
+
+避免使用父類別而使用介面的原因
+* 父類別已經內建了某一個相依物件的依賴，必需先瞭解該相依物件並想辦法覆寫它。
+* 使用介面，能確切知道其底層實作內容，對其有完全的控制。
+
+### 擷取與覆寫
+
+不需要額外撰寫一個新介面或虛設常式物件，只需繼承自被測試類別並重新自訂該類別中的某些行為。
+
+* SUT
+
+    ```php
+    class LogAnalyzerUsingOverrideMethod
+    {
+        public function isValidLogFileName(string $fileName): bool
+        {
+            return $this->isValid($fileName);
+        }
+
+        protected function isValid($fileName): bool
+        {
+            $manager = new FileExtensionManager();
+            return $manager->isValid($fileName);
+        }
+    }
+    ```
+
+---
+* Test
+
+    ```php
+    class LogAnalyzerUsingOverrideMethodTest extends TestCase
+    {
+        public function test_IsValidFileName_NameSupportedExtension_ReturnsTrue()
+        {
+            $log = new TestableLogAnalyzer();
+            $log->isSupported = true;
+
+            $result = $log->isValidLogFileName("short.txt");
+
+            $this->assertTrue($result);
+        }
+    }
+    ```
+
+* Stub
+
+    ```php
+    class TestableLogAnalyzer extends LogAnalyzerUsingOverrideMethod
+    {
+        public $isSupported;
+
+        protected function isValid($fileName): bool
+        {
+            return $this->isSupported;
+        }
+    }
+    ```
+
+---
+class: middle, center, inverse
+
+## 克服封裝問題
+---
+
+### 違反封裝原則
+
+Q: 違反封裝原則：「隱藏所有使用類別所不需要看見的東西」？為了可測試性而使得設計可能暴露更多細節是一件壞事？
+
+A:「別傻了。」
+
+* 物件導向：限制 API 的最終使用者行為，讓物件模型得以被正確地的使用。單元測試程式也是此物件模型的另一個使用端，跟原本的最終使用者一樣重要。
+
+* 封裝外部相依物件，不允許修改、透過私有建構函數或不可繼承類別、使用不能被覆寫的非虛擬方法，**都是過度保護設計的經典特徵**。兼顧可測試性的設計方式：「可測試的物件導向設計 (Testable Object-Oriented Design, TOOD)」
+
+#### 分離特別為測試程式撰寫的程式碼（額外的建構函式與屬性賦值方法）
+
+<mark>PHP 不適用，編譯式語言適用</mark>
+
+* Internal 和 [InternalsVisibleTo]
+* Conditional
+  * 降低程式碼的可讀性，使其變得雜亂無章。
+* \#if 和 \#endif
+  * 也會讓程式看起來雜亂。
+
+為了保持程式的清晰，在合適的時候建議使用 [InternalsVisibleTo]
+
+---
+class: middle, center, inverse
+
+## 小結
+
+---
+### 小結
+
+* 使用介面和繼承，透過 Stub 來解決直接相依的問題
+* 找到合適的中間層，或是建立出這個中間層，然後把它拿來當作接縫。
+* 假物件不一定為虛設常式 (stub) 或是模擬物件 (mock)，因此命名假物件時習慣使用 **fake** 這個詞。
+* 如果需要驗證測試目標與相依物件之間的互動是否符合預期，那麼就該回傳一個介面，而不是直接模擬回傳值。(Ch4)
+* 可測試的物件導向設計 (TOOD)
+
+---
+class: middle, center, inverse
+
+## 問題與討論
+    </textarea>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js">
+  </script>
+  <script>
+    var slideshow = remark.create({
+      highlightStyle: 'monokai',
+      highlightLines: true
+    });
+  </script>
+</body>
+
+</html>
