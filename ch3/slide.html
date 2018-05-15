@@ -367,7 +367,7 @@ class: middle, center, inverse
 ---
 ### 擷取介面以便替換底層實作內容
 
-1 將讀取檔案系統的程式碼，移到單獨的類別中
+Step 1: 將讀取檔案系統的程式碼，移到單獨的類別中
 
 ```php
 class LogAnalyzer
@@ -391,7 +391,7 @@ class FileExtensionManager
 ---
 ### 擷取介面以便替換底層實作內容, Cont.
 
-2 增加 Interface，以抽換 FileExtensionManager
+Step 2: 增加 Interface，以抽換 FileExtensionManager
 
 ```php
 interface ExtensionManagerInterface
@@ -417,7 +417,7 @@ public IsValidLogFileName(string $fileName): bool
 ---
 ### 擷取介面以便替換底層實作內容, Cont.
 
-3 Create Stub
+Step 3: Create Stub
 
 ```php
 class AlwaysValidFakeExtensionManager implements ExtensionManagerInterface
@@ -519,11 +519,12 @@ class AlwaysValidFakeExtensionManager implements ExtensionManagerInterface
 * 使得這些參數成為了必要的依賴 (假設這是被測試類別唯一的建構函式)，使用者必須得為每個特定的依賴傳入參數。
 * 若被測試類別需要多個 Stub 才能在沒有直接依賴關係下正常運作，加入越來越多參數就會越來越困難，降低程式的可讀性與可維護性。
     ```php
-    public function construct($mgr, $logger, $service)
+    public function construct($mgr, $logger, $service, ...)
     {
         $this->manager = $mgr
         $this->logger = $logger
         $this->service = $service
+        ...
     }
     ```
 * Solution
@@ -533,40 +534,40 @@ class AlwaysValidFakeExtensionManager implements ExtensionManagerInterface
 
 #### 優點
 
-* 通常還是會選擇使用建構函式注入，因為在 API 的可讀性和語意上，這方式所帶來的影響是最小的。
+* 通常還是會使用建構函式注入，在 API 的可讀性和語意上，所帶來的影響是最小的。
 * 有效向 API 使用者表達：在呼叫這個 API 時，是必須相依這個物件才能正常運作的，因此需要在初始化時傳入該相依物件。
 
 ---
 ### 用假物件模擬異常
 
 * 透過設定 Stub 來拋出例外
-* ExtensionManager 拋出例外時，LogAnalyzer 應該回傳 false，而不是在把例外往外拋。
+* ExtensionManager 拋出例外時，LogAnalyzer 應該回傳 false，而不是再把例外往外拋。
   * 使用 try catch
 
-        ```php
-        class LogAnalyzer
+    ```php
+    class LogAnalyzer
+    {
+        private $manager;
+
+        public function __construct(ExtensionManagerInterface $mgr)
         {
-            private $manager;
-
-            public function __construct(ExtensionManagerInterface $mgr)
-            {
-                $this->manager = $mgr;
-            }
-
-            public function isValidLogFileName(string $fileName): bool
-            {
-                try {
-                    $valid = $this->manager->isValid($fileName);
-                } catch (Exception $e) {
-                    return false;
-                }
-                return $valid;
-            }
+            $this->manager = $mgr;
         }
-        ```
+
+        public function isValidLogFileName(string $fileName): bool
+        {
+            try {
+                $valid = $this->manager->isValid($fileName);
+            } catch (Exception $e) {
+                return false;
+            }
+            return $valid;
+        }
+    }
+    ```
 
 ---
-* 假物件
+* Stub
 
     ```php
     class FakeExtensionManager implements ExtensionManagerInterface
@@ -583,7 +584,7 @@ class AlwaysValidFakeExtensionManager implements ExtensionManagerInterface
     }
     ```
 
-* 測試程式
+* Test
 
     ```php
     class LogAnalyzerTest extends TestCase
@@ -785,7 +786,6 @@ class AlwaysValidFakeExtensionManager implements ExtensionManagerInterface
 #### 偽造方法─區域的工廠方法（擷取與覆寫 (Extract and Override)）
 
 在接近被測試程式的表層中建立一個全新的中間層。越接近程式碼的表層，為了模擬相依物件所需要修改的內容越少。
-
 1. 被測試類別宣告一區域虛擬方法作為工廠方法，以獲取 FileExtensionManager 物件。作為接縫。
 1. 在測試程式新增一個類別，<mark>繼承</mark>被測試程式，<mark>覆寫</mark>其工廠方法，在這邊注入設定好的假相依物件。
 
@@ -967,20 +967,75 @@ Q: 違反封裝原則：「隱藏所有使用類別所不需要看見的東西�
 A:「別傻了。」
 
 * 物件導向：限制 API 的最終使用者行為，讓物件模型得以被正確地的使用。單元測試程式也是此物件模型的另一個使用端，跟原本的最終使用者一樣重要。
-
 * 封裝外部相依物件，不允許修改、透過私有建構函數或不可繼承類別、使用不能被覆寫的非虛擬方法，**都是過度保護設計的經典特徵**。兼顧可測試性的設計方式：「可測試的物件導向設計 (Testable Object-Oriented Design, TOOD)」
+* 分離特別為測試程式撰寫的程式碼（額外的建構函式與屬性賦值方法）
+    * <mark>PHP 不適用，編譯式語言適用</mark>，以下以 C# 為例。
 
-#### 分離特別為測試程式撰寫的程式碼（額外的建構函式與屬性賦值方法）
+---
+### Internal 和 [InternalsVisibleTo]
 
-<mark>PHP 不適用，編譯式語言適用</mark>
+將公開建構函式標記為 internal，接著使用組件層級 (assembly-level) 的特性 [InternalsVisibleTo]，使其所有標記為 internal 的成員和方法能被測試專案組件使用。
 
-* Internal 和 [InternalsVisibleTo]
-* Conditional
-  * 降低程式碼的可讀性，使其變得雜亂無章。
-* \#if 和 \#endif
-  * 也會讓程式看起來雜亂。
+```csharp
+public class LogAnalyzer
+{
+    ...
+    internal LogAnalyzer (IExtensionManager extensionMgr)
+    {
+        manager = extensionMgr;
+    }
+}
+using System.Runtime.CompilerServices;
+[assembly:
+    InternalsVisibleTo("AUOT.CH3.Logan.Tests")]
+```
 
-為了保持程式的清晰，在合適的時候建議使用 [InternalsVisibleTo]
+如果沒有別的方式將成員和方法對測試程式公開，使用 internal 是不錯的解決方案。
+
+---
+### Conditional
+
+條件編譯參數，最常見為 DEBUG 與 RELEASE，如果編譯標記不存在，帶標記的方法的**呼叫端**就不會包含在這個編譯版本中。
+* 方法所有的呼叫行為都會被移除，而這個方法內容仍會保留下來。
+* 這個帶著標記的方法在產品程式碼中並不會被隱藏。與 #if 和 #endif 不同。
+
+```csharp
+[Conditional ("DEBUG")]
+public void DoSomething()
+{
+
+}
+```
+
+降低程式碼的可讀性，使其變得雜亂無章。
+
+---
+### #if 和 #endif
+
+將方法放在 #if 與 #endif 中，可以確保它們只在對應的編譯參數設定下編譯。
+
+```csharp
+#if DEBUG
+    public LogAnalyzer (IExtensionManager extensionMgr)
+    {
+        manager = extensionMgr;
+    }
+#endif
+...
+#if DEBUG
+    [Test]
+    public void IsValidFileName_SupportedExtension_True()
+    {
+        ...
+        // 建立 analyzer 並注入 Stub
+        LogAnalyzer log = new LogAnalyzer (myFakeManager);
+    }
+#endif
+```
+
+被廣泛地使用，但也會讓程式看起來很雜亂。
+
+<mark>為了保持程式的清晰，在合適的時候建議使用 [InternalsVisibleTo]</mark>
 
 ---
 class: middle, center, inverse
