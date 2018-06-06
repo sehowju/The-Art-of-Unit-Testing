@@ -10,7 +10,7 @@ class LogAnalyzerUsingOverrideMethodTest extends TestCase
 {
     public function test_IsValidFileName_NameSupportedExtension_ReturnsTrue()
     {
-        $log = new TestableLogAnalyzer();
+        $log = new TestableLogAnalyzerUsingOverrideMethod();
         $log->isSupported = true;
 
         $result = $log->isValidLogFileName("short.txt");
@@ -19,7 +19,7 @@ class LogAnalyzerUsingOverrideMethodTest extends TestCase
     }
 }
 
-class TestableLogAnalyzer extends LogAnalyzerUsingOverrideMethod
+class TestableLogAnalyzerUsingOverrideMethod extends LogAnalyzerUsingOverrideMethod
 {
     public $isSupported;
 

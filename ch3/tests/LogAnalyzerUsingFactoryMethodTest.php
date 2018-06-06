@@ -14,13 +14,13 @@ class LogAnalyzerUsingFactoryMethodTest extends TestCase
         $myFakeManager = new FakeExtensionManager();
         $myFakeManager->willBeValid = true;
 
-        $log = new TestableLogAnalyzer($myFakeManager);
+        $log = new TestableLogAnalyzerUsingFactoryMethod($myFakeManager);
         $result = $log->isValidLogFileName("short.txt");
         $this->assertTrue($result);
     }
 }
 
-class TestableLogAnalyzer extends LogAnalyzerUsingFactoryMethod
+class TestableLogAnalyzerUsingFactoryMethod extends LogAnalyzerUsingFactoryMethod
 {
     private $manager;
 
