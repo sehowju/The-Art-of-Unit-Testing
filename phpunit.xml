@@ -6,5 +6,8 @@
     <testsuite name="ch3">
       <directory>ch3/tests</directory>
     </testsuite>
+    <testsuite name="ch4">
+      <directory>ch4/tests</directory>
+    </testsuite>
   </testsuites>
 </phpunit>

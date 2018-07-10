@@ -9,6 +9,7 @@
 * [Ch1, 單元測試基礎, 2017.01.24, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch1/slide.html)
 * [Ch2, 第一個單元測試, 2017.02.05, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch2/slide.html)
 * [Ch3, 透過虛設常式 (Stub) 解決依賴問題, 2017.03.15, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch3/slide.html)
+* [Ch4, 使用模擬物件 (Mock) 驗證互動, 2017.06.07, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch4/slide.html)
 
 ## 電子檔
 

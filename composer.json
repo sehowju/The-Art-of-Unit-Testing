@@ -2,7 +2,8 @@
     "autoload": {
         "psr-4": {
             "Ch2\\": "ch2/",
-            "Ch3\\": "ch3/"
+            "Ch3\\": "ch3/",
+            "Ch4\\": "ch4/"
         }
     },
     "require-dev": {
