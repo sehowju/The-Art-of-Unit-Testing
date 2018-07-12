@@ -17,8 +17,6 @@ class LogAnalyzer2Test extends TestCase
         $tooShortFileName = "abc.txt";
         $log->analyze($tooShortFileName);
 
-        // $this->assert($mockService, $mockService->message);
-
         $this->assertContains("someone@somewhere.com", $mockEmail->to);
         $this->assertContains("can't log", $mockEmail->subject);
         $this->assertContains("fake exception", $mockEmail->body);

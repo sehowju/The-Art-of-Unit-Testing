@@ -16,11 +16,11 @@ class LogAnalyzer2
     public function analyze(string $fileName)
     {
         if (strlen($fileName) < 8) {
-            // try {
+            try {
                 $this->service->logError("Filename too short: " . $fileName);
-            // } catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $this->email->sendEmail("someone@somewhere.com", "can't log", $e->getMessage());
-            // }
+            }
         }
     }
 }

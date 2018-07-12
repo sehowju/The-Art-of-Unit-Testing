@@ -34,7 +34,7 @@ Dino Lai, 2018.06.07
 
 將互動測試作為最後一個選擇，優先考慮能否使用基於回傳值或系統狀態的測試，因為互動測試會讓很多事情變得複雜。
 
-倫敦學派 (the London school of TDD)，出於設計的目的，將虛設常式與模擬物件加到系統設計的過程中。 ─ Growing Object-Oriented Software, Guided by Tests
+倫敦學派 (the London School of TDD)，出於設計的目的，將虛設常式與模擬物件加到系統設計的過程中。- Growing Object-Oriented Software, Guided by Tests
 
 ---
 ### Example
@@ -46,10 +46,17 @@ Dino Lai, 2018.06.07
 
 > 模擬物件：系統中的假物件，它可以拿來驗證被測試物件是否如預期般呼叫這個假物件，因此來使得單元測試執行成功或失敗。通常每個測試裡最多只會有一個模擬物件。
 
-> 假物件：通用的名詞，可以拿來描述一個 Stub 或 Mock，因為 Stub 與 Mock 看上去都很像真實的物件。一個假物件，究竟是 Stub 還是 Mock，取決於它在目前測試裡的使用方式：如果這個假物件是拿來驗證物件之間的互動（對它進行驗證），那它就是 Mock，否則就是 Stub。
+> 假物件：通用的名詞，可以拿來描述一個 Stub 或 Mock，因為 Stub 與 Mock 看上去都很像真實的物件。
+
+---
+class: middle, center, inverse
+
+## Stub vs. Mock
 
 ---
 ## Stub vs Mock
+
+一個假物件，究竟是 Stub 還是 Mock，取決於它在目前測試裡的使用方式：如果這個假物件是拿來驗證物件之間的互動（對它進行驗證），那它就是 Mock，否則就是 Stub。
 
 當你閱讀別人的測試程式時，需要掌握的一項重要技巧就是辯識測試中是否存在著多個 Mock。
 
@@ -67,18 +74,21 @@ Dino Lai, 2018.06.07
 
 針對 Mock 進行驗證，而非待測試類別驗證。
 
-![figure-4.2](figure-4.2.png)
+Mock 比 Stub 多做一件事，它會記錄所有互動的歷史，用來驗證是否符合預期 (expectation)。
+
+.center[![figure-4.2](figure-4.2.png)]
+
+---
+class: middle, center, inverse
+
+## Mock Example
 
 ---
 ## 範例
 
-Mock 比 Stub 多做一件事，它會記錄所有互動的歷史，用來驗證是否符合預期 (expectation)。
-
-### 需求
-
 LogAnalyzer 需要和一個外部的 web 服務介接，每次 LogAnalyzer 遇到一個過短的檔名時，這個 web 服務就會收到一個錯誤的訊息。
 
-![figure-4.3](figure-4.3.png)
+.center[![figure-4.3](figure-4.3.png)]
 
 ---
 * 新增一個介面
@@ -90,7 +100,7 @@ LogAnalyzer 需要和一個外部的 web 服務介接，每次 LogAnalyzer 遇�
     }
     ```
 
-* LogAnalyzer.php
+* LogAnalyzer
 
     ```php
     class LogAnalyzer
@@ -151,9 +161,15 @@ LogAnalyzer 需要和一個外部的 web 服務介接，每次 LogAnalyzer 遇�
 
     測試程式中，是對 Mock 進行驗證，而非 LogAnalyzer 類別。
 
+### 討論
+
 驗證的功能不是寫在 Mock 裡，原因如下：
 * 希望其他測試案例能夠驗證別的東西，能重用這個模擬物件。
 * 閱讀測試程式的人無法看到具體的驗證動作。對測試程式隱藏了關鍵的資訊，降低了測試的可讀性和可維護性。
+---
+class: middle, center, inverse
+
+## 同時使用 Mock 和 Stub
 
 ---
 ## 同時使用 Mock 和 Stub
@@ -164,7 +180,7 @@ LogAnalyzer 需要和一個外部的 web 服務介接，每次 LogAnalyzer 遇�
 
 LogAnalyzer 呼叫 web 服務時，若 web 服務拋出一個例外錯誤，LogAnalyzer 需要把這個錯誤用 email 發送給管理員。
 
-![figure-4.4](figure-4.4.png)
+.center[![figure-4.4](figure-4.4.png)]
 
 ---
 * EmailServiceInterface
@@ -257,9 +273,9 @@ LogAnalyzer 呼叫 web 服務時，若 web 服務拋出一個例外錯誤，LogA
     }
     ```
 
-
-
 ---
+### 討論
+
 程式裡面只包含呼叫外部服務的邏輯，沒有回傳值，也沒有改變系統的狀態。該怎麼測試當 web 服務拋出例外時，LogAnalyzer 有正確地呼叫 email 的服務呢？
 1. 如何替換掉 web 服務？
 1. 如何模擬來自 web 服務所引發的例外，以便測試有如預期般呼叫 email 服務？
@@ -267,29 +283,176 @@ LogAnalyzer 呼叫 web 服務時，若 web 服務拋出一個例外錯誤，LogA
 
 Solution:
 * 1, 2：用 Stub 取代 web 服務
-* 3：用 mock 取代 email 服務
+* 3：用 Mock 取代 email 服務
 
 ---
-![figure-4.5](figure-4.5.png)
+### 解決方法
+
+* 用 Stub 取代 web 服務
+* 用 Mock 取代 email 服務
+
+.center[![figure-4.5](figure-4.5.png)]
 
 ---
-### Code
+* FakeWebServiceException
 
-```php
+    ```php
+    class FakeWebServiceException implements WebServiceInterface
+    {
+        public $lastError;
+        public $toThrow;
 
-```
+        public function logError(string $message)
+        {
+            if (!is_null($this->toThrow)) {
+                throw $this->toThrow;
+            }
+            $this->lastError = $message;
+        }
+    }
+    ```
+
+* FakeEmailService
+
+    ```php
+    class FakeEmailService implements EmailServiceInterface
+    {
+        public $to;
+        public $subject;
+        public $body;
+
+        public function sendEmail(string $to, string $subject, string $body)
+        {
+            $this->to = $to;
+            $this->subject = $subject;
+            $this->body = $body;
+        }
+    }
+    ```
 
 ---
-問題：
+* LogAnalyzer2Test
+
+    ```php
+    class LogAnalyzer2Test extends TestCase
+    {
+        public function test_Analyze_WebServiceThrows_SendsEmail()
+        {
+            $stubService = new FakeWebServiceException();
+            $stubService->toThrow = new \Exception("fake exception");
+            $mockEmail = new FakeEmailService();
+
+            $log = new LogAnalyzer2($stubService, $mockEmail);
+            $tooShortFileName = "abc.txt";
+            $log->analyze($tooShortFileName);
+
+            $this->assertContains("someone@somewhere.com", $mockEmail->to);
+            $this->assertContains("can't log", $mockEmail->subject);
+            $this->assertContains("fake exception", $mockEmail->body);
+        }
+    }
+    ```
+---
+
+### 問題
+
 * 使用多個驗證會產生問題，測試中第一個驗證失敗時，會拋出一個特殊類型的例外，由測試執行器來攔截。這也意味著後面的程式不會再往下執行。
 * 假設即使第一個驗證失敗了，你還需要繼續往下執行下去，這通常代表你需要把這個測試拆成幾個。
   * 建立一個 EmailInfo 物件，包裝屬於 Email 的三個物件，再驗證該物件。
 
-      ```php
+        ```php
+        class EmailInfo
+        {
+            public $to;
+            public $subject;
+            public $body;
+        }
+        ```
 
-      ```
+---
+### Example
 
-問題：一個測試裡，可以使用多少個 Stub 和 Mock？
+* LogAnalyzer
+
+    ```php
+    class LogAnalyzerEmailInfo
+    {
+        public $service;
+        public $email;
+        public $emailInfo;
+
+        public function __construct(WebServiceInterface $service, EmailServiceByEmailInfoInterface $email)
+        {
+            $this->service = $service;
+            $this->email = $email;
+        }
+
+        public function analyze(string $fileName)
+        {
+            if (strlen($fileName) < 8) {
+                try {
+                    $this->service->logError("Filename too short: " . $fileName);
+                } catch (\Exception $e) {
+    *               $emailInfo = new EmailInfo();
+    *               $emailInfo->to = "someone@somewhere.com";
+    *               $emailInfo->subject = "can't log";
+    *               $emailInfo->body = $e->getMessage();
+    *               $this->email->sendEmail($emailInfo);
+                }
+            }
+        }
+    }
+    ```
+---
+* Email Service Interface
+
+    ```php
+    interface EmailServiceByEmailInfoInterface
+    {
+        public function sendEmail(EmailInfo $emailInfo);
+    }
+    ```
+
+* Fake Email Service
+
+    ```php
+    class FakeEmailServiceByEmailInfo implements EmailServiceByEmailInfoInterface
+    {
+        public $emailInfo;
+
+        public function sendEmail(EmailInfo $emailInfo)
+        {
+            $this->emailInfo = $emailInfo;
+        }
+    }
+    ```
+
+---
+* Test
+
+    ```php
+    class LogAnalyzerEmailInfoTest extends TestCase
+    {
+        public function test_Analyze_WebServiceThrows_SendsEmail()
+        {
+            $stubService = new FakeWebService();
+            $stubService->toThrow = new \Exception("fake exception");
+            $mockEmail = new FakeEmailServiceByEmailInfo();
+
+            $log = new LogAnalyzerEmailInfo($stubService, $mockEmail);
+            $tooShortFileName = "abc.txt";
+            $log->analyze($tooShortFileName);
+
+    *       $expectedEmail = new EmailInfo();
+    *       $expectedEmail->to = "someone@somewhere.com";
+    *       $expectedEmail->subject = "can't log";
+    *       $expectedEmail->body = "fake exception";
+    *       $this->assertEquals($expectedEmail, $mockEmail->emailInfo);
+        }
+    }
+    ```
+
+.center[<mark>問題：一個測試裡，可以使用多少個 Stub 和 Mock？</mark>]
 
 ---
 ## 每個物件只用一個 Mock
@@ -298,7 +461,7 @@ Solution:
 * 測試時，先確定誰是 Mock，在把其它假物件都設成 Stub，不對它們進行驗證。
 > 過定指定 (overspecification)：過度地指定在測試中應該要發生事情的行為，而這些事情事實上對測試來說無關緊要。
 額外的指定可能導致測試因為錯誤的原因而失敗：修改了產品程式碼，改變它的工作方式，儘管程式運作正確，但測試卻失敗：「你說你要呼叫這個物件的方法，結果你竟然沒呼叫。」
-* SOP
+* 導入失敗的狀況
   1. 改程式
   1. 測試程式失敗
   1. 修復測試程式
@@ -308,22 +471,38 @@ Solution:
 * 一個測試只能指定三種工作單元最終結果的其中一種，不然的話天下大亂。
 
 ---
+class: middle, center, inverse
+
+## 假物件鏈
+
+---
 ## 假物件鏈：用 Stub 來產生 Mock 或其他 Stub
 
 有的時候需要一個假物件來回傳另一個假的組件，產生自己的小 Stub 物件鏈，最後產生系統深處裡的一個 Mock，在測試中收集某些資料。
 
-```php
-$factory = $this->getServiceFactory();
-$service = $factory->getService();
-```
+* Factory
+
+    ```php
+    $factory = $this->getServiceFactory();
+    $service = $factory->getService();
+    ```
+
+* Object Chain
+
+    ```php
+    $connString = $this->globalUtil->configuration->dbConfiguration->connectionString;
+    ```
+
+---
+### Example
 
 ```php
 $connString = $this->globalUtil->configuration->dbConfiguration->connectionString;
 ```
 
-如果想要在測試中替換掉 connectionString，可以把 globalUtil 物件的 configuration 設定成一個 Stub，然後把 dbConfiguration 設定成另一個 Stub，以此類推，最後回傳一個 Mock或是 connectionString 的 Stub。
+如果想要在測試中替換掉 `connectionString`，可以把 `globalUtil` 物件的 `configuration` 設定成一個 Stub，然後把 `dbConfiguration` 設定成另一個 Stub，以此類推，最後回傳一個 Mock 或是 `connectionString` 的 Stub。
 
-物件鏈是一個很好很強大的技術，可是重構是否比較好？
+<mark>物件鏈是一個很好很強大的技術，可是重構是否比較好？</mark>
 
 ```php
 $connString = $this->getConnectionString();
@@ -336,7 +515,12 @@ protected function getConnectionString(): string
 
 然後使用 extend and override 的技術，覆寫這個方法。
 
-避免使用呼叫鏈 (call chain)，另外一種方式是在 API 外層建立特殊的封裝類別，簡化 API 的使用和測試。─ Adapter Parameter,《Working Effectively with Legacy Code, Michael Feathers》
+避免使用呼叫鏈 (call chain)，另外一種方式是在 API 外層建立特殊的封裝類別，簡化 API 的使用和測試。- Adapter Parameter,《Working Effectively with Legacy Code, Michael Feathers》
+
+---
+class: middle, center, inverse
+
+## 手刻 Mock 和 Stub 的問題
 
 ---
 ## 手刻 Mock 和 Stub 的問題
@@ -348,19 +532,23 @@ protected function getConnectionString(): string
 * 難以在測試中重用 Mock 或 Stub。一但 interface 裡有兩個或三個方法需要實作，程式碼的維護就會顯得異常麻煩。
 * 一個假物件可以同時是 Stub 又是 Mock 嗎？這種情況很少，一個專案裡或許有一兩個。
 
-一個 Mock 如果帶有回傳值的方法，它可能同時扮演著 Stub。你還需要從這些假物件回傳一些假的值，否則程式就無法正常執行。
-  * 很可能你所測試的最終結果壓根方向就錯了。通常會針對那種沒有回傳值的第三方物件互動來當作最終結果，盡量尋找沒有回傳值的方法。
+---
+### Mock 需帶回傳值的問題
 
-有時系統的設計要求第三方的方法必須要有回傳值（代表錯誤資訊），在這種情況下，一個假物件同時作為 Stub 與 Mock。
+一個 Mock 如果帶有回傳值的方法，它可能同時扮演著 Stub。你還需要從這些假物件回傳一些假的值，否則程式就無法正常執行？
 
-```php
-interface ComNotificationServiceInterface
-{
-    public function sendNotification(string $info): int;
-}
-```
+* 很可能你所測試的最終結果壓根方向就錯了。通常會針對那種沒有回傳值的第三方物件互動來當作最終結果，盡量尋找沒有回傳值的方法。
 
-用 Mock 來驗證 sendNotification 是否有被呼叫到，還得回傳一個值，但是回傳值對這個測試沒有影響。
+* 有時系統的設計要求第三方的方法必須要有回傳值（代表錯誤資訊），在這種情況下，一個假物件同時作為 Stub 與 Mock。
+
+    ```php
+    interface ComNotificationServiceInterface
+    {
+        public function sendNotification(string $info): int;
+    }
+    ```
+
+    用 Mock 來驗證 sendNotification 是否有被呼叫到，還得回傳一個值，但是回傳值對這個測試沒有影響。
 
 ---
 class: middle, center, inverse
@@ -368,7 +556,7 @@ class: middle, center, inverse
 ## 小結
 
 ---
-### 小結
+## 小結
 
 * Mock 驗證物件之間的互動，Stub 模擬各種情境
 * 一個測試中不應該存在多個 Mock
