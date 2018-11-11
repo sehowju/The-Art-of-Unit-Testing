@@ -22,8 +22,17 @@
 ### PHP Unit Test Tool
 
 * [PHP Unit](https://phpunit.de/)
+  * [Functions](https://github.com/sebastianbergmann/phpunit/blob/master/src/Framework/Assert/Functions.php)
+  * [API Reference](https://gist.github.com/loonies/1255249)
 * [Visual PHPUnit](http://visualphpunit.github.io/VisualPHPUnit/)
 * [Mockery](https://github.com/mockery/mockery)
+* [Prophecy](https://github.com/phpspec/prophecy)
+
+### Articles
+
+* [A better PHP testing experience: Introduction](https://matthiasnoback.nl/2014/07/a-better-testing-experience/)
+* [A better PHP testing experience Part I: Moving away from assertion-centric unit testing](https://matthiasnoback.nl/2014/07/descriptive-unit-tests/)
+* [A better PHP testing experience Part II: Pick your test doubles wisely](https://matthiasnoback.nl/2014/07/test-doubles/)
 
 ### Origin Resources
 
