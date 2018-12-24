@@ -15,7 +15,8 @@ class LogAnalyzer3Test extends TestCase
         $mockService = $this->createMock(WebServiceInterface::class);
         $stubLogger = $this->createMock(LoggerInterface::class);
         $stubLogger->method("logError")->with($this->isType("string"))->will($this->throwException(new \Exception("fake exception")));
-        $mockService->expects($this->once())->method("write")->with(new ErrorInfo(1000, "fake exception"));
+        $expected = new ErrorInfo(1000, "fake exception");
+        $mockService->expects($this->once())->method("write")->with($expected);
 
         $analyzer = new LogAnalyzer3($stubLogger, $mockService);
         $analyzer->minNameLength = 10;

@@ -27,7 +27,7 @@ class LogAnalyzerTest extends TestCase
         $analyzer->analyze("a.txt");
     }
 
-    public function test_Analyze_TooShortFileName_CallLogger_MockObject()
+    public function test_Analyze_TooShortFileName_CallLogger_MockAndStub()
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('logError')->with($this->equalTo("Filename too short: a.txt"));
@@ -67,7 +67,6 @@ class LogAnalyzerTest extends TestCase
 
     public function test_Analyze_TooShortFileName_CallLogger_Prophecy()
     {
-
         $logger = $this->prophesize(LoggerInterface::class);
         $logger->logError("Filename too short: a.txt")->shouldBeCalled();
         $analyzer = new LogAnalyzer($logger->reveal());
