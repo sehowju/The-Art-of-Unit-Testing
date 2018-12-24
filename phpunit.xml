@@ -12,5 +12,8 @@
     <testsuite name="ch5">
       <directory>ch5/tests</directory>
     </testsuite>
+    <testsuite name="ch8">
+      <directory>ch8/tests</directory>
+    </testsuite>
   </testsuites>
 </phpunit>
