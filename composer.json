@@ -5,10 +5,12 @@
             "Ch3\\": "ch3/",
             "Ch4\\": "ch4/",
             "Ch5\\": "ch5/",
+            "Ch7\\": "ch7/",
             "Ch8\\": "ch8/"
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.5"
+        "phpunit/phpunit": "^6.5",
+        "php-mock/php-mock-phpunit": "^2.1"
     }
 }
