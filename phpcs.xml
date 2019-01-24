@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ruleset>
+    <rule ref="PSR12"/>
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>*/Tests/*</exclude-pattern>
+    </rule>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+</ruleset>
