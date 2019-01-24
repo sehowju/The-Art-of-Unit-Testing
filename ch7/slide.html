@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Ch7 測試階層和組織</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../assets/slide.css">
+</head>
+
+<body>
+  <textarea id="source" class="markdown-body">
+
+class: center, middle, inverse
+
+# 單元測試的藝術
+
+## Ch7 測試階層和組織
+
+Dino Lai, 2019.01.18
+
+---
+## 注入橫切面關注點 (Cross cutting concern)
+
+在產品程式碼中，你有時不希望使用前面章節介紹的依賴注入技術，如擷取介面或覆寫虛擬方法等。在處理橫切關注點 (cross-cutting concerns) 時會碰到這種情況
+
+* DateTime, Exception, Log 這種橫切面關注點使用它們的地方非常多，如果把它們設計成可注入的，對應的程式會非常好測試，但也難以閱讀和維護。
+
+```php
+class TimeLogger
+{
+    public static function createMessage(string $info): string
+    {
+        return date('Y-m-d H:i:s') . " " . $info;
+    }
+}
+```
+
+---
+## Mock DateTime
+
+* use [php-mock](https://github.com/php-mock/php-mock-phpunit)
+* use [uopz](https://github.com/krakjoe/uopz)
+  * install by PEAR, it's C extension
+  * [Docs](http://php.net/manual/en/book.uopz.php)
+* Create new SystemTime::class and replace all of DateTime::class
+    * 這個方式只適用於那些在系統中廣泛使用的東西。
+    * 如何保證每個人都使用這個類別呢？
+      * Code Review
+      * Replace All
+
+---
+## 為應用程式建立測試 API
+
+測試程式重構方法：
+* 建立輔助 (utility) 方法
+* 輔助類別
+* 基礎設計
+
+---
+### 使用繼承類別繼承程式
+
+* DRY (Don't Repeat Yourself)
+* Unit Test 遵循的也是 OOP 的規範
+
+測試程式中常見的問題：
+* 重用輔助方法和工廠方法
+* 在不同類別上執行同一組測試
+* 使用共用的 setup 和 teardown 程式碼
+* 從基底類別繼承而來的子類提供一個測試指引，方便開發人員撰寫測試
+
+基於測試類別的三種 Pattern
+* 抽象測試基礎結構類別
+* 測試類別模板
+* 抽象測試驅動類別
+
+要用到的重構技術
+* 重構類別階層
+* 使用泛型
+
+---
+#### 抽象測試基礎結構類別模式
+
+有一些共用的 setup 和 teardown 程式碼，或是要在多個測試類別中使用一些特定的驗證。
+
+Scenario:
+
+所有的測試都需要應用程式預設的 logger 來完成，將 log 內容存放到記憶體中，不產生 log 實體檔案。（所有的測試都需要解除對 logger 的依賴）
+
+```php
+// TODO
+```
+
+原則：
+* 避免使用 setup，降低可讀性，應該使用更直覺的輔助方法
+* 撰寫說明文件，不然會讓開發人員不清楚應該使用基底類別的哪個 API
+* 沒必要使用多個基底類別
+* 測試中的類別繼承深度**不要**超過一層
+
+---
+#### 測試類別模板模式
+
+* 測試模板類別是一個抽象類別，包含一組抽象測試方法
+* 如果系統中有多個繼承關係，並且衍生子類的每個新成員都完成相同的基本功能，就會選擇使用測試類別模板
+* 開發人員經常會忽視或忘記替特定案例撰寫所有需要的測試。開發人員必須得在衍生子類的測試類別中完成這些約定的內容。
+
+---
+Scenario:
+
+BaseStringParser 是一個抽象類別，其他類別都是它的衍生子類，對不同的字串內容種類完成了一些功能，從每個字串種類（XML 字串、IIS Log 字串和標準字串）可以得到某個版本資訊。
+
+你可以從一個自訂的檔案標頭（字串的前幾行）得到版本資訊，檢查這個版本資訊對你的應用程式是否有效。
+
+XMLStringParser, IISLogStringParser, StandardStringParser 都是這個基底類別的衍生子類，針對特定的字串種類來完成這些方法。
+
+.center[
+![figure7-3](figure-7.3.png)
+
+圖 7-3
+]
+
+---
+Test Step:
+1. 對其中一個衍生子類撰寫一組測試
+2. 對具有相同功能的其他衍生子類也撰寫同類型的測試
+
+Refactor:
+* 怎麼向衍生子類指定哪些是需要的關鍵測試
+
+```php
+//TODO
+```
+
+.center[
+![figure7-4](figure-7.4.png)
+
+圖 7-4
+]
+
+---
+#### 抽象測試驅動類別模式
+
+* [Design Pattern - Template Method](https://en.wikipedia.org/wiki/Template_method_pattern)
+* 「填空」
+* 在基底類別中實作了測試方法，並提供抽象方法掛鉤供衍生子類實作
+* **不是實際在測試一個類別，而是測試產品程式的一個介面或是基底類別**
+
+.center[
+![figure7-5](figure-7.5.png)
+
+圖 7-5
+]
+
+---
+#### 重構測試類別階層
+
+Steps:
+1. 重構：抽起基底類別 (parent class)
+  * 建立一個基底類別 (BaseXXXTest)
+  * 把工廠方法 (ex: getParser) 移到基底類別裡面
+  * 把所有測試方法移到基底類別中
+  * 抽取期望的輸出，放到基底類別的公開欄位
+  * 抽取測試的輸入，放到抽象方法或衍生子類別需要建立的屬性
+2. 重構：使用抽象工廠方法，回傳介面
+3. 重構：找到測試方法中所有使用實際類別的地方，替換成使用這些類別的介面
+4. 在衍生子類中，完成抽象工廠方法，回傳實際類別
+
+---
+#### 使用泛型
+
+---
+class: middle, center, inverse
+
+## 小結
+
+---
+## 小結
+
+---
+class: middle, center, inverse
+
+## 問題與討論
+    </textarea>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js">
+  </script>
+  <script>
+    var slideshow = remark.create({
+      highlightStyle: 'monokai',
+      highlightLines: true
+    });
+  </script>
+</body>
+
+</html>
