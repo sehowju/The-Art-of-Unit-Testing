@@ -167,6 +167,20 @@ Steps:
 ---
 #### 使用泛型
 
+* PHP 沒有泛型，使用建構子取代
+* 使用泛型，子類別不需要覆寫任何方法。
+
+    ```php
+    // TODO
+    ```
+
+* 測試不再需要覆寫 GetParser 工廠方法，而是使用建構子與 PHP `new $className($param...)` 的特性建立物件。
+* 測試不再使用 StringParserInterface 介面，而是使用字串傳進 __construct()
+* 父類別使用 `ReflectionClass` 或是 `class_implements` 檢查傳入的 class 字串是否實作 StringParserInterface
+* 子類別向父類別的測試方法，回傳一個特定的輸入內容。
+
+整體來說，不覺得使用泛型父類別（父類別建構子）好處更多。
+
 ---
 class: middle, center, inverse
 
@@ -179,6 +193,29 @@ class: middle, center, inverse
 class: middle, center, inverse
 
 ## 問題與討論
+---
+## Practice
+
+為此專案建立持續整合系統
+
+### Requirement
+
+* **push 至 master 時自動測試**
+    * **單元測試 (Unit Test)**
+    * **測試涵蓋率 (Coverage)**
+    * 程式碼檢查 (Code Quality) (coding style, bugs, static check, etc..)
+* 每日中午十二點固定測試
+    * 整合測試 (Integration Test)
+    * 漏洞測試 (Penetration Test) (XSS, SQL Injection, etc..)
+* **使用 Code Coverage 服務視覺化涵蓋率**
+* **將測試與使用工具徽章 (Badge) 加在 Repository 上**
+* 測試結果通知 slack notification 頻道
+
+### Resources
+
+* [Awesome PHP](https://github.com/ziadoz/awesome-php)
+* [stackshare](https://stackshare.io/)
+
     </textarea>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js">
   </script>
