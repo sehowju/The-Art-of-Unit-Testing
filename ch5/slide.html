@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Ch5 隔離（模擬）框架</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../assets/slide.css">
+</head>
+
+<body>
+  <textarea id="source" class="markdown-body">
+
+class: center, middle, inverse
+
+# 單元測試的藝術
+
+## Ch5 隔離（模擬）框架
+
+Dino Lai, 2018.11.15
+
+---
+## 隔離框架
+
+隔離框架 (isolation framework)
+> 一個能**在執行時期**建立和設定假物件的類別庫。這些物件稱為**動態虛設常式物件**(dynamic stub) 和**動態模擬物件** (dynamic mock)
+
+好處
+* 可讀性
+* 可維護性
+* 健壯穩定的測試
+* 等等...
+
+定義
+> 一個**隔離框架**是一套可用來幫助寫程式的 API，使用這套 API 來建立假物件，比手刻假物件要容易得多、快得多、簡潔許多。
+
+讓程式碼更為優雅，簡化複雜的測試，提高測試執行速度，並減少測試中的錯誤。
+---
+## 解決重覆的程式碼
+
+如果該方法需要依據傳入的參數來決定回傳值，或是要記住同一個方法多次呼叫的所有參數（參數歷史）又該怎麼辦呢？
+
+```php
+//TODO
+```
+
+---
+## 動態產生假物件
+
+> **動態假物件**是在執行時期建立的任何 Stub 或是 Mock，它的建立不需要手刻假物件的程式碼（寫死在假類別中）
+
+* 使用 PHPUnit 內建的 [Test Doubles](https://phpunit.readthedocs.io/en/7.4/test-doubles.html)
+
+Step:
+1. 準備 (arrange)
+2. 執行 (act)
+3. 驗證 (assert)
+
+---
+### 手刻假物件
+
+```php
+class LogAnalyzerTest extends TestCase
+{
+    public function test_Analyze_TooShortFileName_CallLogger()
+    {
+        $logger = new FakeLogger();
+        $analyzer = new LogAnalyzer($logger);
+        $analyzer->minNameLength = 6;
+        $analyzer->analyze("a.txt");
+        $this->assertContains("too short", $logger->lastError);
+    }
+}
+
+class FakeLogger implements LoggerInterface
+{
+    public $lastError;
+    public function LogError(string $message):void
+    {
+        $this->lastError = $message;
+    }
+}
+```
+
+---
+### 動態產生假物件
+
+```php
+public function test_Analyze_TooShortFileName_CallLogger_MockObject()
+{
+>    $logger = $this->createMock(LoggerInterface::class);
+    $logger->expects($this->once())->method('logError')->with($this->equalTo("Filename too short: a.txt"));
+    $analyzer = new LogAnalyzer($logger);
+    $analyzer->minNameLength = 6;
+    $analyzer->analyze("a.txt");
+}
+```
+
+* 從 Mock 的建立到測試方法的結束，對這個 Mock 的任何互動都會自動紀錄，保留紀錄以供後面進行驗證。
+* `expects($this->once())` 告訴讀測試程式的人：「某個物件應該曾經被呼叫一次，否則這個測試應該失敗。」
+
+---
+### 模擬回傳值
+
+```php
+public function test_Returns_ByDefault_WorksForHardCodeArgument()
+{
+    $fakeRules = $this->createMock(FileNameRulesInterface::class);
+    $fakeRules->method('isValidLogFileName')->with($this->equalTo("strict.txt"))->willReturn(true);
+    $this->assertTrue($fakeRules->isValidLogFileName("strict.txt"));
+}
+```
+
+參數匹配器
+
+```php
+public function test_Returns_ByDefault_WorksForAnyArgument()
+{
+    $fakeRules = $this->createMock(FileNameRulesInterface::class);
+    $fakeRules->method('isValidLogFileName')->with($this->isType('string'))->willReturn(true);
+    $this->assertTrue($fakeRules->isValidLogFileName("strict.txt"));
+}
+```
+
+---
+### 模擬拋出例外
+
+```php
+public function test_Returns_ArgAny_Throws()
+{
+    $this->expectException(\Exception::class);
+    $fakeRules = $this->createMock(FileNameRulesInterface::class);
+    $fakeRules->method('isValidLogFileName')->with($this->isType('string'))->will($this->throwException(new \Exception));
+    $fakeRules->isValidLogFileName("strict.txt");
+}
+```
+
+---
+## 同時使用 Mock 與 Stub
+
+![]()
+
+---
+### Example
+
+如果 log 物件拋出了例外，LogAnalyzer2 會把這個問題通知給 WebService
+
+```php
+public function test_Analyze_loggerThrows_CallsWebService()
+{
+    $mockService = $this->createMock(WebServiceInterface::class);
+    $stubLogger = $this->createMock(LoggerInterface::class);
+    $stubLogger->method("logError")->with($this->isType("string"))->will($this->throwException(new \Exception("fake exception")));
+    $mockService->expects($this->once())->method("write")->with($this->stringContains("fake exception"));
+
+    $analyzer = new LogAnalyzer2($stubLogger, $mockService);
+    $analyzer->minNameLength = 10;
+    $analyzer->analyze("Short.txt");
+}
+```
+
+---
+## 驗證物件是帶著某些屬性的狀況
+
+```php
+public function test_Analyze_loggerThrows_CallsWebServiceWithSubObject()
+{
+    $mockService = $this->createMock(WebServiceInterface::class);
+    $stubLogger = $this->createMock(LoggerInterface::class);
+    $stubLogger->method("logError")->with($this->isType("string"))->will($this->throwException(new \Exception("fake exception")));
+    $expected = new ErrorInfo(1000, "fake exception");
+    $mockService->expects($this->once())->method("write")->with($expected);
+
+    $analyzer = new LogAnalyzer3($stubLogger, $mockService);
+    $analyzer->minNameLength = 10;
+    $analyzer->analyze("Short.txt");
+}
+```
+
+* 框架使用的越多，測試程式的可讀性就越差
+* 使用手刻的 Mock，會不會具備更佳的可讀性
+
+```php
+// TODO: implements example
+```
+---
+
+### 比較兩個物件
+
+要測試參數物件的期望值，最簡單的方式就是比較兩個物件。
+
+```php
+// TODO
+```
+
+只有滿足以下條件時，測試整個物件的方式才可行。
+* 容易建立帶有預設值的物件
+* 需要測試目標物件上的所有屬性
+* 知道全部屬性的期望值
+* 進行比較的兩個物件，實作了 `Equals()` 方法
+
+提醒：如果採用了物件完整比較的方式，就不像透過參數匹配器只檢查屬性字串是否包含了某些值。這樣當未來程式發生變化時，測試的健壯性就會稍微差一點。
+
+討論：你願意放棄多少的可讀性來換取長期的健壯性？
+
+作者：我痛恨得為了不必要的原因而去修改測試程式。
+
+---
+## prophesize
+
+為什麼不該在測試中使用方法名字字串 (method strings) 來指定要模擬的方法？
+
+如果你要修改產品程式碼中的一個方法名稱，在字串中使用了這個方法名字的測試，還是能成功編譯，但在執行時會失敗，拋出例外說找不到這個方法。
+
+```php
+public function test_Analyze_TooShortFileName_CallLogger_Prophecy()
+{
+    $logger = $this->prophesize(LoggerInterface::class);
+    $logger->logError("Filename too short: a.txt")->shouldBeCalled();
+    $analyzer = new LogAnalyzer($logger->reveal());
+    $analyzer->minNameLength = 6;
+    $analyzer->analyze("a.txt");
+}
+```
+
+---
+## 隔離框架的優缺點
+
+優點
+* 更容易驗證參數
+* 更容易驗證一個方法被多次呼叫
+* 更容易建立假物件
+
+陷阱
+* 測試程式可讀性變差
+  * 如果一個測試裡面有多個 Mock，或是很多個意圖不同的驗證，就會降低測試的可讀性，讓測試程式變得難以維護，人們只看程式碼甚至無法了解測試的意圖為何。
+  * 可以考慮去掉一些 Mock 或是期望 Mock 的互動，或是把測試拆分成幾個更小、更好理解的測試案例。
+* 驗證了錯誤的東西
+  * 依循一個好的測試實踐原則，我們認為一個測試一次只測一件事。
+* 一個測試中有多個 Mock
+* 過度指定的測試：你應該盡量避免使用 Mock
+  * 避免過度指定的方法
+    * 盡量使用非嚴格模擬物件
+    * 盡量使用 Stub 而非 Mock
+    * 極力避免把 Stub 當 Mock 使用。
+        * 只有在需要為被測試類別模擬回傳值或拋出例外時，才使用 Stub
+        * 只有在驗證測試中會呼叫某個方法時，才使用 Mock
+
+---
+class: middle, center, inverse
+
+## 小結
+
+---
+## 小結
+
+---
+class: middle, center, inverse
+
+## 問題與討論
+    </textarea>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/remark/0.14.0/remark.min.js">
+  </script>
+  <script>
+    var slideshow = remark.create({
+      highlightStyle: 'monokai',
+      highlightLines: true
+    });
+  </script>
+</body>
+
+</html>
