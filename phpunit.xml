@@ -1,22 +1,22 @@
 <phpunit bootstrap="./vendor/autoload.php">
   <testsuites>
     <testsuite name="ch2">
-      <directory>ch2/tests</directory>
+      <directory>ch2/Tests</directory>
     </testsuite>
     <testsuite name="ch3">
-      <directory>ch3/tests</directory>
+      <directory>ch3/Tests</directory>
     </testsuite>
     <testsuite name="ch4">
-      <directory>ch4/tests</directory>
+      <directory>ch4/Tests</directory>
     </testsuite>
     <testsuite name="ch5">
-      <directory>ch5/tests</directory>
+      <directory>ch5/Tests</directory>
     </testsuite>
     <testsuite name="ch7">
-      <directory>ch7/tests</directory>
+      <directory>ch7/Tests</directory>
     </testsuite>
     <testsuite name="ch8">
-      <directory>ch8/tests</directory>
+      <directory>ch8/Tests</directory>
     </testsuite>
   </testsuites>
 </phpunit>
