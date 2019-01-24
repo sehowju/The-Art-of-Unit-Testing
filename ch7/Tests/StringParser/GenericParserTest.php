@@ -1,8 +1,9 @@
 <?php
 
-namespace Ch7\Src\StringParser;
+namespace Ch7\Tests\StringParser;
 
 use PHPUnit\Framework\TestCase;
+use Ch7\Src\StringParser\StringParserInterface;
 
 abstract class GenericParserTest extends TestCase
 {
@@ -14,6 +15,16 @@ abstract class GenericParserTest extends TestCase
 
     public function __construct($stringParser)
     {
+        // method 1
+        if (!in_array(StringParserInterface::class, class_implements($stringParser))) {
+            throw new \LogicException('StringParserInterface Not Implement');
+        }
+
+        // method 2
+        // $class = new \ReflectionClass($stringParser);
+        // if (!$class->implementsInterface(StringParserInterface::class)) {
+        //     throw new \LogicException('StringParserInterface Not Implement');
+        // }
         parent::__construct();
         $this->parser = $stringParser;
     }

@@ -3,8 +3,7 @@
 namespace Ch7\Tests\StringParser;
 
 use Ch7\Src\StringParser\StandardStringParser;
-use Ch7\Src\StringParser\StringParserInterface;
-use Ch7\Src\StringParser\GenericParserTest;
+use Ch7\Tests\StringParser\GenericParserTest;
 
 class StandardStringParserGenericTest extends GenericParserTest
 {
