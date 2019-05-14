@@ -10,6 +10,8 @@
 * [Ch2, 第一個單元測試, 2017.02.05, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch2/slide.html)
 * [Ch3, 透過虛設常式 (Stub) 解決依賴問題, 2017.03.15, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch3/slide.html)
 * [Ch4, 使用模擬物件 (Mock) 驗證互動, 2017.06.07, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch4/slide.html)
+* [Ch5, 隔離（模擬）框架, 2018.11.15, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch5/slide.html)
+* [Ch7, 測試階層和組織, 2019.01.18, Dino](http://sehowju.github.io/The-Art-of-Unit-Testing/ch7/slide.html)
 
 ## 電子檔
 
